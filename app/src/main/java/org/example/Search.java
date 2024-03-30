@@ -102,7 +102,7 @@ public class Search {
 
         if (depthleft == 0) {
             // return Eval.eval();
-            return -qsearch(-beta, -alpha, depthleft - 1, ply + 1, 0);
+            return qsearch(alpha, beta);
         }
 
         gen();
@@ -148,44 +148,68 @@ public class Search {
         return best_score;
     }
 
-    static int qsearch(int alpha, int beta, int depthleft, int ply, int best_move) throws Exception {
+    static int qsearch(int alpha, int beta) throws Exception {
         if (nodes % 500 == 0) {
             if (System.currentTimeMillis() - time_start > timeout)
                 throw new Exception();
         }
-
+        int standing_pat = Eval.eval();
+        if (standing_pat > beta) {
+            return standing_pat;
+        }
+        if (standing_pat > alpha) {
+            alpha = standing_pat;
+        }
         gen_caps();
         int moves[] = get_stack();
         pop_stack();
 
-        int best_score = -999999999; // failsoft approach
+        int best_score = standing_pat;
 
         int legal_moves = 0;
         for (int i = 0; i < moves.length; i++) {
             int move = moves[i];
             if (make_move(move)) {
-                nodes++;
                 legal_moves++;
+                nodes++;
                 int score;
-                score = -qsearch(-beta, -alpha, depthleft - 1, ply + 1, 0);
+                score = -qsearch(-alpha, -beta);
                 unmake_move();
                 if (score >= beta) {
-                    return score; // Soft fail
+                    return score;
                 }
                 if (score > best_score) {
                     best_score = score;
-                    if (score > alpha) { // alpha acts like max in MiniMax
+                    if (score > alpha) {
                         alpha = score;
-                        set_move(move, ply);
                     }
                 }
             }
         }
-        if (legal_moves == 0) {
-            return Eval.eval();
-        }
         return best_score;
     }
+
+    /*
+     * int Quiesce( int alpha, int beta ) {
+     * int stand_pat = Evaluate();
+     * if( stand_pat >= beta )
+     * return beta;
+     * if( alpha < stand_pat )
+     * alpha = stand_pat;
+     * 
+     * until( every_capture_has_been_examined ) {
+     * MakeCapture();
+     * score = -Quiesce( -beta, -alpha );
+     * TakeBackMove();
+     * 
+     * if( score >= beta )
+     * return beta;
+     * if( score > alpha )
+     * alpha = score;
+     * }
+     * return alpha;
+     * }
+     */
 
     public static int search(int max_depth, long timeout_millis) {
         int score = 0;
