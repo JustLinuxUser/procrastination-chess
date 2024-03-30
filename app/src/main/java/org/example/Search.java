@@ -61,15 +61,14 @@ public class Search {
             int score = 0;
             int move_type = PMove.get_flags(move);
             if (move_type == PMove.EP) {
-                score += 5;
+                score += 100;
             }
             if ((move & PMove.CAPTURE) != 0) {
-                score += 10;
                 int from = PMove.get_from(move);
                 int to = PMove.get_to(move);
                 int from_piece_type = board[from] & TYPE_MASK;
                 int to_piece_type = board[to] & TYPE_MASK;
-                score += mg_value[to_piece_type];
+                score += mg_value[to_piece_type] * 10;
                 score -= mg_value[from_piece_type];
             }
             move = PMove.set_score(move, score);
