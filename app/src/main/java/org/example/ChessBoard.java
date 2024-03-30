@@ -82,10 +82,10 @@ public class ChessBoard {
         int i = 0;
         for (char c : piece_placement.toCharArray()) {
             int my_idx = (63 - (i / 8) * 8) - 7 + i % 8;
-            if (!pieces.contains("" + c)) {
+            if (c >= '1' && c <= '8') {
                 int skip = Integer.parseInt("" + c);
                 i += skip;
-            } else if (c >= '1' && c <= '8') {
+            } else if (pieces.contains("" + c)) {
                 int piece = pieces.indexOf(c);
                 if (piece >= 6) {
                     board[my_idx] = (byte) (piece - 6);
