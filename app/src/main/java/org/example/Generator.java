@@ -25,14 +25,14 @@ public class Generator {
                             && (board[i - 9] & TYPE_MASK) != EMPTY
                             && (board[i - 9] & COLOR_MASK) == WHITE) {
                         if (!promotion(i, (byte) (i - 9))) {
-                            push_move(i, (byte) (i - 9));
+                            push_move(i, (byte) (i - 9), PMove.CAPTURE);
                         }
                     }
                     if (piece_col != 7
                             && (board[i - 7] & TYPE_MASK) != EMPTY
                             && (board[i - 7] & COLOR_MASK) == WHITE) {
                         if (!promotion(i, (byte) (i - 7))) {
-                            push_move(i, (byte) (i - 7));
+                            push_move(i, (byte) (i - 7), PMove.CAPTURE);
                         }
                     }
                     // En passant move generation
@@ -60,11 +60,11 @@ public class Generator {
                     // Push pawn
                     if ((board[i - 8] & TYPE_MASK) == EMPTY) {
                         if (!promotion(i, (byte) (i - 8))) {
-                            push_move(i, (byte) (i - 8));
+                            push_move(i, (byte) (i - 8), 0);
                         }
                         // Double push move generation
                         if (piece_row == 6 && (board[i - 16] & TYPE_MASK) == EMPTY) {
-                            push_move(i, (byte) (i - 16));
+                            push_move(i, (byte) (i - 16), 0);
                         }
                     }
                 } else {
@@ -73,14 +73,14 @@ public class Generator {
                             && (board[i + 9] & TYPE_MASK) != EMPTY
                             && (board[i + 9] & COLOR_MASK) == BLACK) {
                         if (!promotion(i, (byte) (i + 9))) {
-                            push_move(i, (byte) (i + 9));
+                            push_move(i, (byte) (i + 9), PMove.CAPTURE);
                         }
                     }
                     if (piece_col != 0
                             && (board[i + 7] & TYPE_MASK) != EMPTY
                             && (board[i + 7] & COLOR_MASK) == BLACK) {
                         if (!promotion(i, (byte) (i + 7))) {
-                            push_move(i, (byte) (i + 7));
+                            push_move(i, (byte) (i + 7), PMove.CAPTURE);
                         }
                     }
 
@@ -108,10 +108,10 @@ public class Generator {
 
                     if ((board[i + 8] & TYPE_MASK) == EMPTY) {
                         if (!promotion(i, (byte) (i + 8))) {
-                            push_move(i, (byte) (i + 8));
+                            push_move(i, (byte) (i + 8), 0);
                         }
                         if (piece_row == 1 && (board[i + 16] & TYPE_MASK) == EMPTY) {
-                            push_move(i, (byte) (i + 16));
+                            push_move(i, (byte) (i + 16), 0);
                         }
                     }
                 }
@@ -133,11 +133,11 @@ public class Generator {
                         byte to_color = (byte) (to_piece & COLOR_MASK);
 
                         if (to_type == EMPTY) {
-                            push_move(i, to);
+                            push_move(i, to, 0);
                         } else if (to_color == piece_color) {
                             break;
                         } else {
-                            push_move(i, to); // capture
+                            push_move(i, to, PMove.CAPTURE); // capture
                             break;
                         }
                         if (piece_type == PAWN || piece_type == KNIGHT || piece_type == KING) { // they dont slide
@@ -165,6 +165,7 @@ public class Generator {
                         }
                     }
                 } else {
+                    // System.out.println("Black king");
                     if ((castle & CASTLE_BK) != 0) {
                         if (!attack(F8) && !attack(G8)
                                 && (board[F8] & TYPE_MASK) == EMPTY
@@ -185,4 +186,138 @@ public class Generator {
             }
         }
     }
+
+    public static void gen_caps() {
+        new_substack();
+        for (byte i = 0; i < 64; i++) {
+            byte piece = board[i];
+            byte piece_type = (byte) (piece & TYPE_MASK);
+            byte piece_color = (byte) (piece & COLOR_MASK);
+            byte piece_col = (byte) (i % 8);
+
+            if (piece_type == EMPTY) {
+                continue;
+            }
+            if (piece_color != side) {
+                continue;
+            }
+            if (piece_type == PAWN) {
+                if (piece_color == BLACK) {
+                    if (piece_col != 0
+                            && (board[i - 9] & TYPE_MASK) != EMPTY
+                            && (board[i - 9] & COLOR_MASK) == WHITE) {
+                        if (!promotion_queen(i, (byte) (i - 9))) {
+                            push_move(i, (byte) (i - 9), PMove.CAPTURE);
+                        }
+                    }
+                    if (piece_col != 7
+                            && (board[i - 7] & TYPE_MASK) != EMPTY
+                            && (board[i - 7] & COLOR_MASK) == WHITE) {
+                        if (!promotion_queen(i, (byte) (i - 7))) {
+                            push_move(i, (byte) (i - 7), PMove.CAPTURE);
+                        }
+                    }
+                    // En passant move generation
+                    if (piece_col != 7
+                            && ep == i + 1
+                            && (board[i - 7] & TYPE_MASK) == EMPTY) { // Ep, no capture
+                        push_move(i, (byte) (i - 7), PMove.EP);
+                    } else if (piece_col != 7
+                            && ep == i + 1
+                            && (board[i - 7] & TYPE_MASK) != EMPTY
+                            && (board[i - 7] & COLOR_MASK) == WHITE) { // Ep, with capture, super rare :)
+                        push_move(i, (byte) (i - 7), PMove.EP | PMove.CAPTURE);
+                    }
+                    if (piece_col != 0
+                            && ep == i - 1
+                            && (board[i - 9] & TYPE_MASK) == EMPTY) { // Ep, no capture
+                        push_move(i, (byte) (i - 9), PMove.EP);
+                    } else if (piece_col != 0
+                            && ep == i - 1
+                            && (board[i - 9] & TYPE_MASK) != EMPTY
+                            && (board[i - 9] & COLOR_MASK) == WHITE) { // Ep, with capture, super rare :)
+                        push_move(i, (byte) (i - 9), PMove.EP | PMove.CAPTURE);
+                    }
+
+                    // Push pawn
+                    if ((board[i - 8] & TYPE_MASK) == EMPTY) {
+                        if (!promotion_queen(i, (byte) (i - 8))) {
+                            push_move(i, (byte) (i - 8), 0);
+                        }
+                    }
+                } else {
+                    // White pawn
+                    if (piece_col != 7
+                            && (board[i + 9] & TYPE_MASK) != EMPTY
+                            && (board[i + 9] & COLOR_MASK) == BLACK) {
+                        if (!promotion_queen(i, (byte) (i + 9))) {
+                            push_move(i, (byte) (i + 9), PMove.CAPTURE);
+                        }
+                    }
+                    if (piece_col != 0
+                            && (board[i + 7] & TYPE_MASK) != EMPTY
+                            && (board[i + 7] & COLOR_MASK) == BLACK) {
+                        if (!promotion_queen(i, (byte) (i + 7))) {
+                            push_move(i, (byte) (i + 7), PMove.CAPTURE);
+                        }
+                    }
+
+                    // En passant move generation
+                    if (piece_col != 0
+                            && ep == i - 1
+                            && (board[i + 7] & TYPE_MASK) == EMPTY) { // Ep, no capture
+                        push_move(i, (byte) (i + 7), PMove.EP);
+                    } else if (piece_col != 0
+                            && ep == i - 1
+                            && (board[i + 7] & TYPE_MASK) != EMPTY
+                            && (board[i + 7] & COLOR_MASK) == BLACK) { // Ep, with capture, super rare :)
+                        push_move(i, (byte) (i - 7), PMove.EP | PMove.CAPTURE);
+                    }
+                    if (piece_col != 7
+                            && ep == i + 1
+                            && (board[i + 9] & TYPE_MASK) == EMPTY) { // Ep, no capture
+                        push_move(i, (byte) (i + 9), PMove.EP);
+                    } else if (piece_col != 7
+                            && ep == i + 1
+                            && (board[i + 9] & TYPE_MASK) != EMPTY
+                            && (board[i + 9] & COLOR_MASK) == BLACK) { // Ep, with capture, super rare :)
+                        push_move(i, (byte) (i + 9), PMove.EP | PMove.CAPTURE);
+                    }
+
+                    if ((board[i + 8] & TYPE_MASK) == EMPTY) {
+                        if (!promotion_queen(i, (byte) (i + 8))) {
+                            push_move(i, (byte) (i + 8), 0);
+                        }
+                    }
+                }
+            } else {
+                byte idx120 = MAILBOX64[i];
+                byte[] offsets = OFFSETS[piece_type];
+                for (byte offset : offsets) {
+                    byte to;
+                    byte idx120_curr = idx120;
+                    while (true) {
+                        idx120_curr += offset;
+                        to = MAILBOX[idx120_curr];
+                        if (to == -1) {
+                            break;
+                        }
+
+                        byte to_piece = board[to];
+                        byte to_type = (byte) (to_piece & TYPE_MASK);
+                        byte to_color = (byte) (to_piece & COLOR_MASK);
+
+                        if (to_type != EMPTY && to_color != piece_color) {
+                            push_move(i, to, PMove.CAPTURE); // capture
+                            break;
+                        }
+                        if (piece_type == PAWN || piece_type == KNIGHT || piece_type == KING) { // they dont slide
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }

@@ -95,13 +95,14 @@ public class Search {
     }
 
     static int alphaBeta(int alpha, int beta, int depthleft, int ply, int best_move) throws Exception {
-        if (nodes % 50 == 0) {
+        if (nodes % 500 == 0) {
             if (System.currentTimeMillis() - time_start > timeout)
                 throw new Exception();
         }
 
         if (depthleft == 0) {
-            return Eval.eval();
+            // return Eval.eval();
+            return -qsearch(-beta, -alpha, depthleft - 1, ply + 1, 0);
         }
 
         gen();
@@ -112,7 +113,7 @@ public class Search {
 
         // score_moves(moves, ply);
         // sort_moves(moves, ply);
-        if (ply == 0 && timeout != 0) {
+        if (ply == 0 && best_move != 0) {
             swap_best_move(moves, best_move);
         }
         int legal_moves = 0;
@@ -143,6 +144,48 @@ public class Search {
             } else {
                 return 0;
             }
+        }
+        return best_score;
+    }
+
+    static int qsearch(int alpha, int beta, int depthleft, int ply, int best_move) throws Exception {
+        if (nodes % 500 == 0) {
+            if (System.currentTimeMillis() - time_start > timeout)
+                throw new Exception();
+        }
+
+        gen_caps();
+        int moves[] = get_stack();
+        pop_stack();
+
+        int best_score = -999999999; // failsoft approach
+
+        if (ply == 0 && best_move != 0) {
+            swap_best_move(moves, best_move);
+        }
+        int legal_moves = 0;
+        for (int i = 0; i < moves.length; i++) {
+            int move = moves[i];
+            if (make_move(move)) {
+                nodes++;
+                legal_moves++;
+                int score;
+                score = -qsearch(-beta, -alpha, depthleft - 1, ply + 1, 0);
+                unmake_move();
+                if (score >= beta) {
+                    return score; // Soft fail
+                }
+                if (score > best_score) {
+                    best_score = score;
+                    if (score > alpha) { // alpha acts like max in MiniMax
+                        alpha = score;
+                        set_move(move, ply);
+                    }
+                }
+            }
+        }
+        if (legal_moves == 0) {
+            return Eval.eval();
         }
         return best_score;
     }
