@@ -85,7 +85,7 @@ public class ChessBoard {
             if (!pieces.contains("" + c)) {
                 int skip = Integer.parseInt("" + c);
                 i += skip;
-            } else if (c >= 1 && c <= 8) {
+            } else if (c >= '1' && c <= '8') {
                 int piece = pieces.indexOf(c);
                 if (piece >= 6) {
                     board[my_idx] = (byte) (piece - 6);
@@ -93,6 +93,8 @@ public class ChessBoard {
                     board[my_idx] = (byte) (piece | BLACK);
                 }
                 i++;
+            } else {
+                continue;
             }
         }
         String turn = subcmds[1];
