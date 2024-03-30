@@ -40,22 +40,19 @@ public class Search {
         return PMove.toString(pv_arr[0][0], ChessBoard.side);
     }
 
-    public static void sort_moves(int[] moves, int ply) {
-        for (int i = 0; i < moves.length - 1; i++) {
-            int m1_score = PMove.get_score(moves[i]);
-            int max = -99999;
-            int max_idx = i;
-            for (int j = i + 1; j < moves.length; j++) {
-                int m2_score = PMove.get_score(moves[j]);
-                if (m2_score > max) {
-                    max = m2_score;
-                    max_idx = j;
-                }
+    public static void pick_move(int[] moves, int i) {
+        int max = -99999;
+        int max_idx = i;
+        for (int j = i; j < moves.length; j++) {
+            int m2_score = PMove.get_score(moves[j]);
+            if (m2_score > max) {
+                max = m2_score;
+                max_idx = j;
             }
-            int temp = moves[i];
-            moves[i] = moves[max_idx];
-            moves[max_idx] = temp;
         }
+        int temp = moves[i];
+        moves[i] = moves[max_idx];
+        moves[max_idx] = temp;
     }
 
     public static void score_moves(int[] moves) {
@@ -161,12 +158,12 @@ public class Search {
         int moves[] = get_stack();
         pop_stack();
         score_moves(moves);
-        sort_moves(moves);
 
         int best_score = standing_pat;
 
         int legal_moves = 0;
         for (int i = 0; i < moves.length; i++) {
+            pick_move(moves, i);
             int move = moves[i];
             if (make_move(move)) {
                 legal_moves++;
