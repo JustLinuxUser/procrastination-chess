@@ -160,9 +160,6 @@ public class Search {
 
         int best_score = -999999999; // failsoft approach
 
-        if (ply == 0 && best_move != 0) {
-            swap_best_move(moves, best_move);
-        }
         int legal_moves = 0;
         for (int i = 0; i < moves.length; i++) {
             int move = moves[i];
