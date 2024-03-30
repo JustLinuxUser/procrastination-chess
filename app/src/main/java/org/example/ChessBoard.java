@@ -186,10 +186,6 @@ public class ChessBoard {
         return ret;
     }
 
-    static void push_move(byte from, byte to) {
-        stack_push_move(PMove.move_to_int(from, to));
-    }
-
     static void push_move(byte from, byte to, int flags) {
         stack_push_move(PMove.move_to_int(from, to, (byte) flags));
     }
@@ -228,6 +224,31 @@ public class ChessBoard {
                 push_move(from, to, PMove.PROMO | PMove.PROMO_KNIGHT);
                 push_move(from, to, PMove.PROMO | PMove.PROMO_BSHOP);
                 push_move(from, to, PMove.PROMO | PMove.PROMO_ROOK);
+            }
+        }
+        return true;
+    }
+
+    static boolean promotion_queen(byte from, byte to) {
+        if (side == WHITE) { // White
+            if (to < 56) {
+                return false;
+            }
+            if (to - from != 8) { // diagonal capture
+                // we need to generate all, because there is a chance that the queen will make a
+                // draw
+                push_move(from, to, PMove.CAPTURE | PMove.PROMO | PMove.PROMO_QUEEN);
+            } else {
+                push_move(from, to, PMove.PROMO | PMove.PROMO_QUEEN);
+            }
+        } else {
+            if (to > 7) {
+                return false;
+            }
+            if (to - from != -8) { // diagonal capture
+                push_move(from, to, PMove.PROMO | PMove.CAPTURE | PMove.PROMO_QUEEN);
+            } else {
+                push_move(from, to, PMove.PROMO | PMove.PROMO_QUEEN);
             }
         }
         return true;
