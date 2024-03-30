@@ -34,7 +34,7 @@ public class UCI {
                 for (int i = 3; i < subcommands.length; i++) {
                     if (!make_move(subcommands[i])) {
                         System.out.println("Could not find the move!!! " + subcommands[i]);
-                        setup_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+                        System.exit(-1);
                         return;
                     }
                 }
@@ -65,5 +65,6 @@ public class UCI {
             search(6, time_to_think);
             System.out.println("bestmove " + get_best_move(6));
         }
+        System.out.flush();
     }
 }

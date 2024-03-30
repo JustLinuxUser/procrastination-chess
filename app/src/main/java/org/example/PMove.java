@@ -73,26 +73,14 @@ public class PMove {
         String promo = "";
         if ((flags & PROMO) == PROMO) {
             byte move_type = (byte) (flags & TYPE_MASK);
-            if (side == Definitions.BLACK) {
-                if (move_type == PROMO_ROOK) {
-                    promo += "r";
-                } else if (move_type == PROMO_BSHOP) {
-                    promo += "b";
-                } else if (move_type == PROMO_KNIGHT) {
-                    promo += "n";
-                } else if (move_type == PROMO_QUEEN) {
-                    promo += "q";
-                }
-            } else {
-                if (move_type == PROMO_ROOK) {
-                    promo += "R";
-                } else if (move_type == PROMO_BSHOP) {
-                    promo += "B";
-                } else if (move_type == PROMO_KNIGHT) {
-                    promo += "N";
-                } else if (move_type == PROMO_QUEEN) {
-                    promo += "Q";
-                }
+            if (move_type == PROMO_ROOK) {
+                promo += "r";
+            } else if (move_type == PROMO_BSHOP) {
+                promo += "b";
+            } else if (move_type == PROMO_KNIGHT) {
+                promo += "n";
+            } else if (move_type == PROMO_QUEEN) {
+                promo += "q";
             }
         }
         return Notation.fromIdx(from) + Notation.fromIdx(to) + promo;
