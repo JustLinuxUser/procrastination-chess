@@ -58,7 +58,7 @@ public class Search {
         }
     }
 
-    public static void score_moves(int[] moves, int ply) {
+    public static void score_moves(int[] moves) {
         for (int i = 0; i < moves.length; i++) {
             int move = moves[i];
             int score = 0;
@@ -74,9 +74,6 @@ public class Search {
                 int to_piece_type = board[to] & TYPE_MASK;
                 score += mg_value[to_piece_type];
                 score -= mg_value[from_piece_type];
-            }
-            if (ply == 0 && move == best_move) {
-                score += 999999; // pv moves first
             }
             move = PMove.set_score(move, score);
             moves[i] = move;
@@ -163,6 +160,8 @@ public class Search {
         gen_caps();
         int moves[] = get_stack();
         pop_stack();
+        score_moves(moves);
+        sort_moves(moves);
 
         int best_score = standing_pat;
 
