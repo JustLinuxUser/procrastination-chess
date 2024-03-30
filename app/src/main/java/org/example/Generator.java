@@ -9,18 +9,18 @@ public class Generator {
         for (byte i = 0; i < 64; i++) {
             byte piece = board[i];
             byte piece_type = (byte) (piece & TYPE_MASK);
-            // System.out.println("Piece type: " + piece_type);
             byte piece_color = (byte) (piece & COLOR_MASK);
             byte piece_col = (byte) (i % 8);
             byte piece_row = (byte) (i / 8);
-            if (piece_type == EMPTY) { // is empty
+
+            if (piece_type == EMPTY) {
                 continue;
             }
-            if (piece_color != side) { // A piece of opposite color
+            if (piece_color != side) {
                 continue;
             }
-            if (piece_type == PAWN) { // A pawn
-                if (piece_color == BLACK) { // Black pawn
+            if (piece_type == PAWN) {
+                if (piece_color == BLACK) {
                     if (piece_col != 0
                             && (board[i - 9] & TYPE_MASK) != EMPTY
                             && (board[i - 9] & COLOR_MASK) == WHITE) {
@@ -57,7 +57,7 @@ public class Generator {
                         push_move(i, (byte) (i - 9), PMove.EP | PMove.CAPTURE);
                     }
 
-                    // Push
+                    // Push pawn
                     if ((board[i - 8] & TYPE_MASK) == EMPTY) {
                         if (!promotion(i, (byte) (i - 8))) {
                             push_move(i, (byte) (i - 8));
@@ -69,7 +69,6 @@ public class Generator {
                     }
                 } else {
                     // White pawn
-                    //
                     if (piece_col != 7
                             && (board[i + 9] & TYPE_MASK) != EMPTY
                             && (board[i + 9] & COLOR_MASK) == BLACK) {
@@ -166,7 +165,6 @@ public class Generator {
                         }
                     }
                 } else {
-                    // System.out.println("Black king");
                     if ((castle & CASTLE_BK) != 0) {
                         if (!attack(F8) && !attack(G8)
                                 && (board[F8] & TYPE_MASK) == EMPTY

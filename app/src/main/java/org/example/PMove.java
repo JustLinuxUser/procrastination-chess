@@ -83,6 +83,6 @@ public class PMove {
                 promo += "q";
             }
         }
-        return Notation.fromIdx(from) + Notation.fromIdx(to) + promo;
+        return Notation.from_idx(from) + Notation.from_idx(to) + promo;
     }
 }

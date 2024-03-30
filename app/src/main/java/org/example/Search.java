@@ -12,8 +12,8 @@ public class Search {
     public static int[][] pv_arr = new int[20][200];
     public static int best_move = 0;
     public static int nodes = 0;
-    public static long time = System.currentTimeMillis();
-    public static long time_out = 0;
+    public static long time_start = System.currentTimeMillis();
+    public static long timeout = 0;
 
     public static void set_move(int move, int ply) {
         pv_arr[ply][0] = move; // -1, because the depth 0 will never do anything
@@ -95,23 +95,24 @@ public class Search {
     }
 
     static int alphaBeta(int alpha, int beta, int depthleft, int ply, int best_move) throws Exception {
+        if (nodes % 50 == 0) {
+            if (System.currentTimeMillis() - time_start > timeout)
+                throw new Exception();
+        }
+
         if (depthleft == 0) {
             return Eval.eval();
-        }
-        if (nodes % 50 == 0) {
-            if (System.currentTimeMillis() - time > time_out)
-                throw new Exception();
         }
 
         gen();
         int moves[] = get_stack();
         pop_stack();
 
-        int bestscore = -999999999; // failsoft approach
+        int best_score = -999999999; // failsoft approach
 
         // score_moves(moves, ply);
         // sort_moves(moves, ply);
-        if (ply == 0 && time_out != 0) {
+        if (ply == 0 && timeout != 0) {
             swap_best_move(moves, best_move);
         }
         int legal_moves = 0;
@@ -126,8 +127,8 @@ public class Search {
                 if (score >= beta) {
                     return score; // Soft fail
                 }
-                if (score > bestscore) {
-                    bestscore = score;
+                if (score > best_score) {
+                    best_score = score;
                     if (score > alpha) { // alpha acts like max in MiniMax
                         alpha = score;
                         set_move(move, ply);
@@ -143,14 +144,14 @@ public class Search {
                 return 0;
             }
         }
-        return bestscore;
+        return best_score;
     }
 
     public static int search(int max_depth, long timeout_millis) {
         int score = 0;
         nodes = 0;
-        time = System.currentTimeMillis();
-        time_out = timeout_millis;
+        time_start = System.currentTimeMillis();
+        timeout = timeout_millis;
         best_move = 0;
         int prev_score = 0;
         for (int depth = 1; depth <= max_depth; depth++) {
@@ -163,8 +164,8 @@ public class Search {
             }
             best_move = pv_arr[0][0];
         }
-        long timeEnd = System.currentTimeMillis();
-        double time_diff_secs = (timeEnd - time) / 1000;
+        long time_end = System.currentTimeMillis();
+        double time_diff_secs = (time_end - time_start) / 1000;
         System.out.println("info nps " + (int) (nodes / time_diff_secs));
         return score;
     }

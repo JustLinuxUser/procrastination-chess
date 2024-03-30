@@ -4,9 +4,6 @@
 package org.example;
 
 import static org.example.ChessBoard.setup_board;
-import static org.example.Search.*;
-
-import java.util.List;
 
 public class App {
 

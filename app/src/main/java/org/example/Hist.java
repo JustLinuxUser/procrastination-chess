@@ -1,8 +1,6 @@
 package org.example;
 
 public class Hist {
-    // Pmove (from, to, flags)
-    // b
     int move;
     byte ep;
     byte captured;

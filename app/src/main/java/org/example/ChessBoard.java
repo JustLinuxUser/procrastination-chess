@@ -33,14 +33,6 @@ public class ChessBoard {
     static List<Integer> move_stack_offsets = new ArrayList<>();
     static List<Hist> history = new ArrayList<>();
 
-    static void setup_board() {
-        for (int i = 0; i < 64; i++) {
-            if (i >= 48) {
-                board[i] = (byte) (board[i] | BLACK);
-            }
-        }
-    };
-
     static void new_substack() {
         int curr_offset = move_stack_offsets.getLast();
         move_stack_offsets.addLast(curr_offset);
@@ -62,13 +54,13 @@ public class ChessBoard {
         return moves;
     }
 
-    static int get_stack_len() {
+    static int stack_len() {
         int offset = get_stack_offset();
         int offset_end = get_stack_end();
         return offset_end - offset;
     }
 
-    static void push_substack(int h) {
+    static void stack_push_move(int h) {
         int curr_offset = move_stack_offsets.removeLast();
         move_stacks[curr_offset] = h;
         move_stack_offsets.addLast(curr_offset + 1);
@@ -79,26 +71,21 @@ public class ChessBoard {
     }
 
     static void setup_board(String fen) {
-        // rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
-        // lovercase -> black
-        // Start with black, go line by line down (up in my case)
         move_stack_offsets.addLast(0);
         move_stack_offsets.addLast(0);
-        String[] spl = fen.split(" ");
-        String placement = spl[0];
+        String[] subcmds = fen.split(" ");
+        String piece_placement = subcmds[0];
         String pieces = "pnbrkqPNBRKQ";
         for (int i = 0; i < 64; i++) {
             board[i] = EMPTY;
         }
         int i = 0;
-        for (char c : placement.toCharArray()) {
+        for (char c : piece_placement.toCharArray()) {
             int my_idx = (63 - (i / 8) * 8) - 7 + i % 8;
-            if (c == '/')
-                continue;
             if (!pieces.contains("" + c)) {
                 int skip = Integer.parseInt("" + c);
                 i += skip;
-            } else {
+            } else if (c >= 1 && c <= 8) {
                 int piece = pieces.indexOf(c);
                 if (piece >= 6) {
                     board[my_idx] = (byte) (piece - 6);
@@ -108,14 +95,14 @@ public class ChessBoard {
                 i++;
             }
         }
-        String turn = spl[1];
+        String turn = subcmds[1];
         if (turn.equals("w")) {
             side = 0;
         } else {
             side = BLACK;
         }
 
-        String castling = spl[2];
+        String castling = subcmds[2];
         castle = 0;
         if (castling.contains("k")) {
             castle |= CASTLE_BK;
@@ -130,11 +117,11 @@ public class ChessBoard {
             castle |= CASTLE_WQ;
         }
 
-        String ep = spl[3];
+        String ep = subcmds[3];
         if (ep.equals("-")) {
             ChessBoard.ep = -1;
         } else {
-            ChessBoard.ep = Notation.toIdx(ep);
+            ChessBoard.ep = Notation.to_idx(ep);
         }
     }
 
@@ -190,7 +177,7 @@ public class ChessBoard {
         }
         ret += " ";
         if (ep != -1) {
-            ret += Notation.fromIdx(ep);
+            ret += Notation.from_idx(ep);
         } else {
             ret += "-";
         }
@@ -198,11 +185,11 @@ public class ChessBoard {
     }
 
     static void push_move(byte from, byte to) {
-        push_substack(PMove.move_to_int(from, to));
+        stack_push_move(PMove.move_to_int(from, to));
     }
 
     static void push_move(byte from, byte to, int flags) {
-        push_substack(PMove.move_to_int(from, to, (byte) flags));
+        stack_push_move(PMove.move_to_int(from, to, (byte) flags));
     }
 
     static boolean promotion(byte from, byte to) {
@@ -327,7 +314,6 @@ public class ChessBoard {
         byte flags = PMove.get_flags(m);
 
         byte piece = board[from];
-        byte piece_color = (byte) (piece & COLOR_MASK);
         byte piece_type = (byte) (piece & TYPE_MASK);
         byte move_type = (byte) (flags & PMove.TYPE_MASK);
         if (move_type == PMove.CASTLE_KING) {
