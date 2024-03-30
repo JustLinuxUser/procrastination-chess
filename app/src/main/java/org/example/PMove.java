@@ -51,11 +51,11 @@ public class PMove {
     }
 
     public static byte get_score(int move) {
-        return (byte) (move >> 24);
+        return (byte) (move >> 24 & 0xff);
     }
 
     public static byte get_flags(int move) {
-        return (byte) (move >> 16);
+        return (byte) (move >> 16 & 0xff);
     }
 
     public static byte get_to(int move) {
