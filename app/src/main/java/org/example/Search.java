@@ -105,13 +105,14 @@ public class Search {
 
         int best_score = -999999999; // failsoft approach
 
-        // score_moves(moves, ply);
+        score_moves(moves);
         // sort_moves(moves, ply);
         if (ply == 0 && best_move != 0) {
             swap_best_move(moves, best_move);
         }
         int legal_moves = 0;
         for (int i = 0; i < moves.length; i++) {
+            pick_move(moves, i);
             int move = moves[i];
             if (make_move(move)) {
                 nodes++;
