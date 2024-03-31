@@ -27,7 +27,7 @@ public class UCI {
             System.out.println("readyok");
         } else if (subcommands[0].equals("position")) {
             if (subcommands[1].equals("fen")) {
-                String fen = command.substring("position fen ".length() - 1);
+                String fen = command.substring("position fen ".length());
                 setup_board(fen);
             } else if (subcommands[1].equals("startpos")) {
                 setup_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
