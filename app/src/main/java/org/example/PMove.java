@@ -46,12 +46,12 @@ public class PMove {
     }
 
     public static long set_score(long move, int score) {
-        move |= score << 24;
+        move = ((long) score << 32) | (move & 0xffffffffL);
         return move;
     }
 
     public static int get_score(long move) {
-        return (int) move >> 24;
+        return (int) (move >> 32);
     }
 
     public static byte get_flags(long move) {

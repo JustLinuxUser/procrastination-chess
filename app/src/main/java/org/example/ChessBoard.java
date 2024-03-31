@@ -7,7 +7,9 @@ import java.util.Scanner;
 import java.util.stream.Collectors;
 
 import static org.example.Generator.*;
+import static org.example.Search.pick_move;
 import static org.example.Search.print_pv;
+import static org.example.Search.score_moves;
 import static org.example.Search.search;
 import static org.example.Definitions.*;
 
@@ -530,11 +532,14 @@ public class ChessBoard {
             gen();
             long[] moves = get_stack();
             pop_stack();
-            int i = 0;
-            for (long m : moves) {
+            score_moves(moves);
+            for (int i = 0; i < moves.length; i++) {
+                pick_move(moves, i);
+                long m = moves[i];
                 byte flags = PMove.get_flags(m);
-                System.out.println(i + " " + PMove.toString(m, side) + " " + Integer.toBinaryString(flags));
-                i++;
+                int score = PMove.get_score(m);
+                System.out
+                        .println(i + " " + PMove.toString(m, side) + " " + Integer.toBinaryString(flags) + " " + score);
             }
             System.out.println("Count: " + moves.length);
             System.out.print("> ");

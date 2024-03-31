@@ -41,9 +41,9 @@ public class Search {
     }
 
     public static void pick_move(long[] moves, int i) {
-        int max = -99999;
+        int max = PMove.get_score(moves[i]);
         int max_idx = i;
-        for (int j = i; j < moves.length; j++) {
+        for (int j = i + 1; j < moves.length; j++) {
             int m2_score = PMove.get_score(moves[j]);
             if (m2_score > max) {
                 max = m2_score;
@@ -59,19 +59,20 @@ public class Search {
         for (int i = 0; i < moves.length; i++) {
             long move = moves[i];
             int score = 0;
-            int move_type = PMove.get_flags(move);
-            if (move_type == PMove.EP) {
+            int move_flags = PMove.get_flags(move);
+            if ((move_flags & PMove.TYPE_MASK) == PMove.EP) {
                 score += 100;
             }
-            if ((move & PMove.CAPTURE) != 0) {
+            if ((move_flags & PMove.CAPTURE) != 0) {
                 int from = PMove.get_from(move);
                 int to = PMove.get_to(move);
                 int from_piece_type = board[from] & TYPE_MASK;
                 int to_piece_type = board[to] & TYPE_MASK;
-                score += mg_value[to_piece_type] * 10;
                 score -= mg_value[from_piece_type];
+                score += mg_value[to_piece_type] * 100;
             }
             move = PMove.set_score(move, score);
+            System.out.println("Score: " + score);
             moves[i] = move;
         }
     }
