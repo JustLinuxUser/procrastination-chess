@@ -1,7 +1,7 @@
 package org.example;
 
 public class Hist {
-    int move;
+    long move;
     byte ep;
     byte captured;
     byte from_piece;

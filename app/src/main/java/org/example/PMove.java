@@ -28,7 +28,7 @@ public class PMove {
         //@formatter:on
     public byte flags = 0;
 
-    public static int move_to_int(byte from, byte to) {
+    public static long create_move(byte from, byte to) {
         int move = 0;
         move |= to;
         move = move << 8;
@@ -36,8 +36,8 @@ public class PMove {
         return move;
     }
 
-    public static int move_to_int(byte from, byte to, byte flags) {
-        int move = flags;
+    public static long create_move(byte from, byte to, byte flags) {
+        long move = flags;
         move = move << 8;
         move |= to;
         move = move << 8;
@@ -45,28 +45,28 @@ public class PMove {
         return move;
     }
 
-    public static int set_score(int move, int score) {
-        move |= score << 24;
+    public static long set_score(long move, int score) {
+        move = ((long) score << 32) | (move & 0xffffffffL);
         return move;
     }
 
-    public static byte get_score(int move) {
-        return (byte) (move >> 24);
+    public static int get_score(long move) {
+        return (int) (move >> 32);
     }
 
-    public static byte get_flags(int move) {
-        return (byte) (move >> 16);
+    public static byte get_flags(long move) {
+        return (byte) (move >> 16 & 0xff);
     }
 
-    public static byte get_to(int move) {
+    public static byte get_to(long move) {
         return (byte) (move >> 8 & 0xff);
     }
 
-    public static byte get_from(int move) {
+    public static byte get_from(long move) {
         return (byte) (move & 0xff);
     }
 
-    public static String toString(int m, byte side) {
+    public static String toString(long m, byte side) {
         byte from = PMove.get_from(m);
         byte to = PMove.get_to(m);
         byte flags = PMove.get_flags(m);
