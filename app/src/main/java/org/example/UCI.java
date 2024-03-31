@@ -31,6 +31,7 @@ public class UCI {
                 int i = 2;
                 for (; i < subcommands.length; i++) {
                     if (subcommands[i].equals("moves")) {
+                        i++;
                         break;
                     } else {
                         fen += subcommands[i] + " ";
