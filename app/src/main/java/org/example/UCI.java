@@ -27,8 +27,23 @@ public class UCI {
             System.out.println("readyok");
         } else if (subcommands[0].equals("position")) {
             if (subcommands[1].equals("fen")) {
-                String fen = command.substring("position fen ".length());
+                String fen = "";
+                int i = 2;
+                for (; i < subcommands.length; i++) {
+                    if (subcommands[i].equals("moves")) {
+                        break;
+                    } else {
+                        fen += subcommands[i] + " ";
+                    }
+                }
                 setup_board(fen);
+                for (; i < subcommands.length; i++) {
+                    if (!make_move(subcommands[i])) {
+                        System.out.println("Could not find the move!!! " + subcommands[i]);
+                        System.exit(-1);
+                        return;
+                    }
+                }
             } else if (subcommands[1].equals("startpos")) {
                 setup_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
                 for (int i = 3; i < subcommands.length; i++) {
