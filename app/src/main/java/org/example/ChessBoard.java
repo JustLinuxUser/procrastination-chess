@@ -29,7 +29,7 @@ public class ChessBoard {
             3, 1, 2, 4, 5, 2, 1, 3
     }; // 2, 3, 4 rth bit are for piece type, 1st bit is for piece color
 
-    static int[] move_stacks = new int[1000];
+    static long[] move_stacks = new long[1000];
     static List<Integer> move_stack_offsets = new ArrayList<>();
     static List<Hist> history = new ArrayList<>();
 
@@ -47,10 +47,10 @@ public class ChessBoard {
         return move_stack_offsets.getLast();
     }
 
-    static int[] get_stack() {
+    static long[] get_stack() {
         int offset = get_stack_offset();
         int offset_end = get_stack_end();
-        int[] moves = Arrays.copyOfRange(move_stacks, offset, offset_end);
+        long[] moves = Arrays.copyOfRange(move_stacks, offset, offset_end);
         return moves;
     }
 
@@ -60,7 +60,7 @@ public class ChessBoard {
         return offset_end - offset;
     }
 
-    static void stack_push_move(int h) {
+    static void stack_push_move(long h) {
         int curr_offset = move_stack_offsets.removeLast();
         move_stacks[curr_offset] = h;
         move_stack_offsets.addLast(curr_offset + 1);
@@ -187,7 +187,7 @@ public class ChessBoard {
     }
 
     static void push_move(byte from, byte to, int flags) {
-        stack_push_move(PMove.move_to_int(from, to, (byte) flags));
+        stack_push_move(PMove.create_move(from, to, (byte) flags));
     }
 
     static boolean promotion(byte from, byte to) {
@@ -330,7 +330,7 @@ public class ChessBoard {
         return is_checked;
     }
 
-    static boolean make_move(int m) {
+    static boolean make_move(long m) {
         boolean checked = is_checked();
         byte from = PMove.get_from(m);
         byte to = PMove.get_to(m);
@@ -421,7 +421,7 @@ public class ChessBoard {
 
     static void unmake_move() {
         Hist hist = history.removeLast();
-        int m = hist.move;
+        long m = hist.move;
         byte from = PMove.get_from(m);
         byte to = PMove.get_to(m);
         byte flags = PMove.get_flags(m);
@@ -462,9 +462,9 @@ public class ChessBoard {
             return 1;
         }
         gen();
-        int[] moves = get_stack();
+        var moves = get_stack();
         long count = 0;
-        for (int m : moves) {
+        for (var m : moves) {
             if (make_move(m)) {
                 count += perft(depth - 1);
                 unmake_move();
@@ -478,12 +478,12 @@ public class ChessBoard {
         long count = 0;
         String result = "";
         String[] s_arr_req_moves = s_req_moves.split(" ");
-        List<Integer> req_moves = new ArrayList<>();
+        List<Long> req_moves = new ArrayList<>();
         gen();
-        int[] generated_moves = get_stack();
+        var generated_moves = get_stack();
         if (s_arr_req_moves.length != 1) {
             for (String wanted_move : s_arr_req_moves) {
-                for (int m : generated_moves) {
+                for (var m : generated_moves) {
                     if (PMove.toString(m, side).equals(wanted_move)) {
                         req_moves.addLast(m);
                         break;
@@ -494,7 +494,7 @@ public class ChessBoard {
             req_moves = Arrays.stream(generated_moves).boxed().collect(Collectors.toList());
         }
 
-        for (int m : req_moves) {
+        for (var m : req_moves) {
             if (make_move(m)) {
                 long curr_count = perft(depth - 1);
                 result += PMove.toString(m, side) + " " + curr_count + "\n";
@@ -511,9 +511,9 @@ public class ChessBoard {
 
     static boolean make_move(String requested_move) {
         gen();
-        int[] generated_moves = get_stack();
+        long[] generated_moves = get_stack();
         pop_stack();
-        for (int m : generated_moves) {
+        for (var m : generated_moves) {
             if (PMove.toString(m, side).equals(requested_move)) {
                 if (make_move(m)) {
                     return true;
@@ -528,10 +528,10 @@ public class ChessBoard {
         while (true) {
             print();
             gen();
-            int[] moves = get_stack();
+            long[] moves = get_stack();
             pop_stack();
             int i = 0;
-            for (int m : moves) {
+            for (long m : moves) {
                 byte flags = PMove.get_flags(m);
                 System.out.println(i + " " + PMove.toString(m, side) + " " + Integer.toBinaryString(flags));
                 i++;
