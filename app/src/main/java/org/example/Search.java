@@ -72,7 +72,6 @@ public class Search {
                 score += mg_value[to_piece_type] * 100;
             }
             move = PMove.set_score(move, score);
-            System.out.println("Score: " + score);
             moves[i] = move;
         }
     }
