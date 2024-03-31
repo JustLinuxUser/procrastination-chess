@@ -64,12 +64,13 @@ public class Search {
                 score += 100;
             }
             if ((move_flags & PMove.CAPTURE) != 0) {
-                int from = PMove.get_from(move);
                 int to = PMove.get_to(move);
-                int from_piece_type = board[from] & TYPE_MASK;
+                int from = PMove.get_from(move);
+
                 int to_piece_type = board[to] & TYPE_MASK;
-                score -= mg_value[from_piece_type];
+                int from_piece_type = board[from] & TYPE_MASK;
                 score += mg_value[to_piece_type] * 100;
+                score -= mg_value[from_piece_type];
             }
             move = PMove.set_score(move, score);
             moves[i] = move;
@@ -94,8 +95,8 @@ public class Search {
         }
 
         if (depthleft == 0) {
-            // return Eval.eval();
-            return qsearch(alpha, beta);
+            return Eval.eval();
+            // return qsearch(alpha, beta);
         }
 
         gen();
@@ -104,7 +105,7 @@ public class Search {
 
         int best_score = -999999999; // failsoft approach
 
-        score_moves(moves);
+        // score_moves(moves);
         // sort_moves(moves, ply);
         if (ply == 0 && best_move != 0) {
             swap_best_move(moves, best_move);
@@ -148,8 +149,8 @@ public class Search {
                 throw new Exception();
         }
         int standing_pat = Eval.eval();
-        if (standing_pat > beta) {
-            return standing_pat;
+        if (standing_pat >= beta) {
+            return beta;
         }
         if (standing_pat > alpha) {
             alpha = standing_pat;
@@ -157,19 +158,16 @@ public class Search {
         gen_caps();
         long moves[] = get_stack();
         pop_stack();
-        score_moves(moves);
+        // score_moves(moves);
 
         int best_score = standing_pat;
 
-        int legal_moves = 0;
         for (int i = 0; i < moves.length; i++) {
-            pick_move(moves, i);
+            // pick_move(moves, i);
             long move = moves[i];
             if (make_move(move)) {
-                legal_moves++;
                 nodes++;
-                int score;
-                score = -qsearch(-alpha, -beta);
+                int score = -qsearch(-alpha, -beta);
                 unmake_move();
                 if (score >= beta) {
                     return score;
