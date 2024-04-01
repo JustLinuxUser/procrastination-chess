@@ -43,7 +43,7 @@ public class Search {
     public static void pick_move(long[] moves, int i) {
         int max = PMove.get_score(moves[i]);
         int max_idx = i;
-        for (int j = i + 1; j < moves.length; j++) {
+        for (int j = i; j < moves.length; j++) {
             int m2_score = PMove.get_score(moves[j]);
             if (m2_score > max) {
                 max = m2_score;
@@ -105,7 +105,7 @@ public class Search {
 
         int best_score = -999999999; // failsoft approach
 
-        // score_moves(moves);
+         score_moves(moves);
         // sort_moves(moves, ply);
         if (ply == 0 && best_move != 0) {
             swap_best_move(moves, best_move);
@@ -135,7 +135,7 @@ public class Search {
         if (legal_moves == 0) {
             boolean checked = is_checked();
             if (checked) {
-                return -100000;
+                return -100000 + ply;
             } else {
                 return 0;
             }
@@ -150,7 +150,7 @@ public class Search {
         }
         int standing_pat = Eval.eval();
         if (standing_pat >= beta) {
-            return beta;
+            return standing_pat;
         }
         if (standing_pat > alpha) {
             alpha = standing_pat;
@@ -174,9 +174,9 @@ public class Search {
                 }
                 if (score > best_score) {
                     best_score = score;
-                    if (score > alpha) {
-                        alpha = score;
-                    }
+                }
+                if (score > alpha) {
+                    alpha = score;
                 }
             }
         }
