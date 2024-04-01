@@ -75,21 +75,10 @@ public class Search {
                 score -= mg_value[from_piece_type];
             }
             if (ply == 0 && best_move == move) {
-                 score += 100_0_000_00;
+                score += 100_0_000_00;
             }
             move = PMove.set_score(move, score);
             moves[i] = move;
-        }
-    }
-
-    public static void swap_best_move(long[] moves, long best_move) {
-        for (int i = 0; i < moves.length; i++) {
-            if (moves[i] == best_move) {
-                long temp = moves[0];
-                moves[0] = moves[i];
-                moves[i] = temp;
-                break;
-            }
         }
     }
 
@@ -101,7 +90,7 @@ public class Search {
         }
 
         if (depthleft == 0) {
-            //return Eval.eval();
+            // return Eval.eval();
             return qsearch(alpha, beta, 0);
         }
 
@@ -111,11 +100,7 @@ public class Search {
 
         int best_score = -999999999; // failsoft approach
 
-         score_moves(moves, ply);
-        // sort_moves(moves, ply);
-        // if (ply == 0 && best_move != 0) {
-        //    swap_best_move(moves, best_move);
-         //}
+        score_moves(moves, ply);
         int legal_moves = 0;
         for (int i = 0; i < moves.length; i++) {
             pick_move(moves, i);
@@ -169,7 +154,7 @@ public class Search {
         int best_score = standing_pat;
 
         for (int i = 0; i < moves.length; i++) {
-             pick_move(moves, i);
+            pick_move(moves, i);
             long move = moves[i];
             if (make_move(move)) {
                 int score = -qsearch(-beta, -alpha, depth + 1);
