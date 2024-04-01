@@ -60,6 +60,7 @@ public class Search {
     }
 
     public static void score_moves(long[] moves, int ply) {
+        int best_move_matches = 0;
         for (int i = 0; i < moves.length; i++) {
             long move = moves[i];
             int score = 0;
@@ -76,10 +77,14 @@ public class Search {
                 score -= mg_value[from_piece_type];
             }
             if (ply == 0 && best_move == move) {
-                score += 100_0_000_00;
+                score += 100000000;
+                best_move_matches++;
             }
             move = PMove.set_score(move, score);
             moves[i] = move;
+        }
+        if (best_move_matches > 1) {
+            System.exit(1);
         }
     }
 
