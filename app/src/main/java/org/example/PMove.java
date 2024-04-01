@@ -10,7 +10,7 @@ public class PMove {
     public static final byte PROMO_ROOK = 5;
     public static final byte PROMO_QUEEN = 6;
     public static final byte TYPE_MASK = 0b1111;
-    public static final byte PROMO = 0b001_0000;
+    public static final byte PROMO = 0b0001_0000;
     public byte from;
     public byte to;
     // public byte score;
@@ -46,7 +46,7 @@ public class PMove {
     }
 
 public static long set_score(long move, int score) {
-    move |= ((long) score << 32) ;
+    move = ((long) score << 32) | (move & 0xffffffffL);
     return move;
 }
 

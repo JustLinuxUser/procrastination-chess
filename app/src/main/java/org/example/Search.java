@@ -14,6 +14,9 @@ public class Search {
     public static int nodes = 0;
     public static long time_start = System.currentTimeMillis();
     public static long timeout = 0;
+    public static long timer = 0;
+    public static long timeInAB = 0;
+    public static long timeInQ = 0;
 
     public static void set_move(long move, int ply) {
         pv_arr[ply][0] = move; // -1, because the depth 0 will never do anything
@@ -59,25 +62,20 @@ public class Search {
         for (int i = 0; i < moves.length; i++) {
             long move = moves[i];
             int score = 0;
+            int to = PMove.get_to(move);
+            int from = PMove.get_from(move);
             int move_flags = PMove.get_flags(move);
             if ((move_flags & PMove.TYPE_MASK) == PMove.EP) {
                 score += 100;
             }
             if ((move_flags & PMove.CAPTURE) != 0) {
-                int to = PMove.get_to(move);
-                int from = PMove.get_from(move);
-            
                 int to_piece_type = board[to] & TYPE_MASK;
                 int from_piece_type = board[from] & TYPE_MASK;
                 score += mg_value[to_piece_type] * 100;
                 score -= mg_value[from_piece_type];
             }
             if (ply == 0 && best_move == move) {
-                score += 100000;
-            }
-            if (score < 0) {
-                //System.out.println(PMove.toString(move, ChessBoard.side) + " piece_from: " + board[from] + " to: " + board[to]);
-                System.exit(-1);
+                 score += 100_0_000_00;
             }
             move = PMove.set_score(move, score);
             moves[i] = move;
@@ -96,14 +94,15 @@ public class Search {
     }
 
     static int alphaBeta(int alpha, int beta, int depthleft, int ply) throws Exception {
+        nodes++;
         if (nodes % 500 == 0) {
             if (System.currentTimeMillis() - time_start > timeout)
                 throw new Exception();
         }
 
         if (depthleft == 0) {
-            return Eval.eval();
-            // return qsearch(alpha, beta);
+            //return Eval.eval();
+            return qsearch(alpha, beta, 0);
         }
 
         gen();
@@ -114,15 +113,14 @@ public class Search {
 
          score_moves(moves, ply);
         // sort_moves(moves, ply);
-         if (ply == 0 && best_move != 0) {
-         //   swap_best_move(moves, best_move);
-         }
+        // if (ply == 0 && best_move != 0) {
+        //    swap_best_move(moves, best_move);
+         //}
         int legal_moves = 0;
         for (int i = 0; i < moves.length; i++) {
-            //pick_move(moves, i);
+            pick_move(moves, i);
             long move = moves[i];
             if (make_move(move)) {
-                nodes++;
                 legal_moves++;
                 int score;
                 score = -alphaBeta(-beta, -alpha, depthleft - 1, ply + 1);
@@ -150,7 +148,8 @@ public class Search {
         return best_score;
     }
 
-    static int qsearch(int alpha, int beta) throws Exception {
+    static int qsearch(int alpha, int beta, int depth) throws Exception {
+        nodes++;
         if (nodes % 500 == 0) {
             if (System.currentTimeMillis() - time_start > timeout)
                 throw new Exception();
@@ -165,16 +164,15 @@ public class Search {
         gen_caps();
         long moves[] = get_stack();
         pop_stack();
-        // score_moves(moves);
+        score_moves(moves, 2);
 
         int best_score = standing_pat;
 
         for (int i = 0; i < moves.length; i++) {
-            // pick_move(moves, i);
+             pick_move(moves, i);
             long move = moves[i];
             if (make_move(move)) {
-                nodes++;
-                int score = -qsearch(-alpha, -beta);
+                int score = -qsearch(-beta, -alpha, depth + 1);
                 unmake_move();
                 if (score >= beta) {
                     return score;
