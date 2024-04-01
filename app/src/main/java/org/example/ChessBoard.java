@@ -529,7 +529,7 @@ public class ChessBoard {
         Scanner s = new Scanner(System.in);
         while (true) {
             print();
-            gen();
+            gen_caps();
             long[] moves = get_stack();
             pop_stack();
             score_moves(moves, 1);

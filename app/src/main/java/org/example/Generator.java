@@ -187,7 +187,7 @@ public class Generator {
                             && ep == i + 1
                             && (board[i - 7] & TYPE_MASK) == EMPTY) { // Ep, no capture
                         push_move(i, (byte) (i - 7), PMove.EP);
-                    } 
+                    }
                     if (piece_col != 7
                             && (board[i - 7] & TYPE_MASK) != EMPTY
                             && (board[i - 7] & COLOR_MASK) == WHITE) {
@@ -199,7 +199,7 @@ public class Generator {
                             && ep == i - 1
                             && (board[i - 9] & TYPE_MASK) == EMPTY) { // Ep, no capture
                         push_move(i, (byte) (i - 9), PMove.EP);
-                    } 
+                    }
                     if (piece_col != 0
                             && (board[i - 9] & TYPE_MASK) != EMPTY
                             && (board[i - 9] & COLOR_MASK) == WHITE) {
@@ -217,7 +217,7 @@ public class Generator {
                             && ep == i - 1
                             && (board[i + 7] & TYPE_MASK) == EMPTY) {
                         push_move(i, (byte) (i + 7), PMove.EP);
-                    } 
+                    }
                     if (piece_col != 0
                             && (board[i + 7] & TYPE_MASK) != EMPTY
                             && (board[i + 7] & COLOR_MASK) == BLACK) {
@@ -227,9 +227,9 @@ public class Generator {
                     }
                     if (piece_col != 7
                             && ep == i + 1
-                            && (board[i + 9] & TYPE_MASK) == EMPTY) { 
+                            && (board[i + 9] & TYPE_MASK) == EMPTY) {
                         push_move(i, (byte) (i + 9), PMove.EP);
-                    } 
+                    }
 
                     if (piece_col != 7
                             && (board[i + 9] & TYPE_MASK) != EMPTY
@@ -260,7 +260,10 @@ public class Generator {
                         byte to_type = (byte) (to_piece & TYPE_MASK);
                         byte to_color = (byte) (to_piece & COLOR_MASK);
 
-                        if (to_type != EMPTY && to_color != piece_color) {
+                        if (to_color == piece_color) {
+                            break;
+                        }
+                        if (to_type != EMPTY) {
                             push_move(i, to, PMove.CAPTURE); // capture
                             break;
                         }

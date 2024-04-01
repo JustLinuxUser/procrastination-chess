@@ -15,6 +15,7 @@ public class Search {
     public static long time_start = System.currentTimeMillis();
     public static long timeout = 0;
     public static long timer = 0;
+    public static int is_timing_q = 0;
     public static long timeInAB = 0;
     public static long timeInQ = 0;
 
@@ -91,6 +92,9 @@ public class Search {
 
         if (depthleft == 0) {
             // return Eval.eval();
+            timeInAB += System.currentTimeMillis() - timer;
+            timer = System.currentTimeMillis();
+            is_timing_q = 1;
             return qsearch(alpha, beta, 0);
         }
 
@@ -173,38 +177,24 @@ public class Search {
         return best_score;
     }
 
-    /*
-     * int Quiesce( int alpha, int beta ) {
-     * int stand_pat = Evaluate();
-     * if( stand_pat >= beta )
-     * return beta;
-     * if( alpha < stand_pat )
-     * alpha = stand_pat;
-     * 
-     * until( every_capture_has_been_examined ) {
-     * MakeCapture();
-     * score = -Quiesce( -beta, -alpha );
-     * TakeBackMove();
-     * 
-     * if( score >= beta )
-     * return beta;
-     * if( score > alpha )
-     * alpha = score;
-     * }
-     * return alpha;
-     * }
-     */
-
     public static int search(int max_depth, long timeout_millis) {
         int score = 0;
         nodes = 0;
         time_start = System.currentTimeMillis();
         timeout = timeout_millis;
         best_move = 0;
+        timer = System.currentTimeMillis();
         int prev_score = 0;
         for (int depth = 1; depth <= max_depth; depth++) {
             try {
                 prev_score = score;
+                if (is_timing_q == 0) {
+                    timeInQ += System.currentTimeMillis() - timer;
+                } else {
+                    timeInAB += System.currentTimeMillis() - timer;
+                }
+                is_timing_q = 0;
+                timer = System.currentTimeMillis();
                 score = alphaBeta(-9999999, 9999999, depth, 0);
             } catch (Exception e) {
                 score = prev_score;
