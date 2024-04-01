@@ -111,8 +111,8 @@ public class Search {
             timeInAB += System.currentTimeMillis() - timer;
             timer = System.currentTimeMillis();
             is_timing_q = 1;
-            //return qsearch(alpha, beta, 0);
-            return Eval.eval();
+            return qsearch(alpha, beta, 0);
+            //return Eval.eval();
         }
 
         gen();
