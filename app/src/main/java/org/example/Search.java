@@ -144,7 +144,7 @@ public class Search {
                 throw new Exception();
         }
         int standing_pat = Eval.eval();
-        if (standing_pat >= beta) {
+        if (standing_pat >= beta || depth >= 2) {
             return standing_pat;
         }
         if (standing_pat > alpha) {
