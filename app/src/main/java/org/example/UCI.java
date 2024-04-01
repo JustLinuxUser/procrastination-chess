@@ -78,7 +78,7 @@ public class UCI {
                 time_inc = Integer.parseInt(attributes.get("binc"));
             }
             int time_to_think = time_left / 20 + time_inc / 2;
-            search(6, time_to_think);
+            search(99, time_to_think);
             System.out.println("bestmove " + get_best_move(6));
         }
         System.out.flush();

@@ -88,6 +88,17 @@ public class Search {
         }
     }
 
+    public static void swap_best_move(long[] moves) {
+        for (int i = 0; i < moves.length; i++) {
+            if (moves[i] == best_move) {
+                long temp = moves[0];
+                moves[0] = moves[i];
+                moves[i] = temp;
+                break;
+            }
+        }
+    }
+
     static int alphaBeta(int alpha, int beta, int depthleft, int ply) throws Exception {
         nodes++;
         if (nodes % 500 == 0) {
@@ -100,7 +111,8 @@ public class Search {
             timeInAB += System.currentTimeMillis() - timer;
             timer = System.currentTimeMillis();
             is_timing_q = 1;
-            return qsearch(alpha, beta, 0);
+            //return qsearch(alpha, beta, 0);
+            return Eval.eval();
         }
 
         gen();
@@ -108,11 +120,14 @@ public class Search {
         pop_stack();
 
         int best_score = -999999999; // failsoft approach
+        if (ply == 0 && best_move != 0) {
+            swap_best_move(moves);
+        }
 
-        score_moves(moves, ply);
+        //score_moves(moves, ply);
         int legal_moves = 0;
         for (int i = 0; i < moves.length; i++) {
-            pick_move(moves, i);
+            //pick_move(moves, i);
             long move = moves[i];
             if (make_move(move)) {
                 legal_moves++;
@@ -180,7 +195,8 @@ public class Search {
             }
         }
         return best_score;
-    }
+    } 
+
 
     public static int search(int max_depth, long timeout_millis) {
         int score = 0;
