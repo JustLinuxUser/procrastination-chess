@@ -55,7 +55,7 @@ public class Search {
         moves[max_idx] = temp;
     }
 
-    public static void score_moves(long[] moves) {
+    public static void score_moves(long[] moves, int ply) {
         for (int i = 0; i < moves.length; i++) {
             long move = moves[i];
             int score = 0;
@@ -66,11 +66,18 @@ public class Search {
             if ((move_flags & PMove.CAPTURE) != 0) {
                 int to = PMove.get_to(move);
                 int from = PMove.get_from(move);
-
+            
                 int to_piece_type = board[to] & TYPE_MASK;
                 int from_piece_type = board[from] & TYPE_MASK;
                 score += mg_value[to_piece_type] * 100;
                 score -= mg_value[from_piece_type];
+            }
+            if (ply == 0 && best_move == move) {
+                score += 100000;
+            }
+            if (score < 0) {
+                //System.out.println(PMove.toString(move, ChessBoard.side) + " piece_from: " + board[from] + " to: " + board[to]);
+                System.exit(-1);
             }
             move = PMove.set_score(move, score);
             moves[i] = move;
@@ -105,14 +112,14 @@ public class Search {
 
         int best_score = -999999999; // failsoft approach
 
-         score_moves(moves);
+         score_moves(moves, ply);
         // sort_moves(moves, ply);
-        if (ply == 0 && best_move != 0) {
-            swap_best_move(moves, best_move);
-        }
+         if (ply == 0 && best_move != 0) {
+         //   swap_best_move(moves, best_move);
+         }
         int legal_moves = 0;
         for (int i = 0; i < moves.length; i++) {
-            pick_move(moves, i);
+            //pick_move(moves, i);
             long move = moves[i];
             if (make_move(move)) {
                 nodes++;

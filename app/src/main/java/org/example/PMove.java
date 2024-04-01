@@ -10,7 +10,7 @@ public class PMove {
     public static final byte PROMO_ROOK = 5;
     public static final byte PROMO_QUEEN = 6;
     public static final byte TYPE_MASK = 0b1111;
-    public static final byte PROMO = 0b0001_0000;
+    public static final byte PROMO = 0b001_0000;
     public byte from;
     public byte to;
     // public byte score;
@@ -45,25 +45,25 @@ public class PMove {
         return move;
     }
 
-    public static long set_score(long move, int score) {
-        move = ((long) score << 32) | (move & 0xffffffffL);
-        return move;
-    }
+public static long set_score(long move, int score) {
+    move |= ((long) score << 32) ;
+    return move;
+}
 
     public static int get_score(long move) {
         return (int) (move >> 32);
     }
 
     public static byte get_flags(long move) {
-        return (byte) (move >> 16 & 0xff);
+        return (byte) (move >> 16 & 0xffL);
     }
 
     public static byte get_to(long move) {
-        return (byte) (move >> 8 & 0xff);
+        return (byte) (move >> 8 & 0xffL);
     }
 
     public static byte get_from(long move) {
-        return (byte) (move & 0xff);
+        return (byte) (move & 0xffL);
     }
 
     public static String toString(long m, byte side) {

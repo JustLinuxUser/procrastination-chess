@@ -532,7 +532,7 @@ public class ChessBoard {
             gen();
             long[] moves = get_stack();
             pop_stack();
-            score_moves(moves);
+            score_moves(moves, 1);
             for (int i = 0; i < moves.length; i++) {
                 pick_move(moves, i);
                 long m = moves[i];
